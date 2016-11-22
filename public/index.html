@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>RIPTA bus viewer</title>
+    <link rel="stylesheet" type="text/css" href="style/style.css">
+    <script src="https://www.gstatic.com/firebasejs/3.6.1/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyCfO-_m33XvSdZ1QXN6aE4cxZVh_MK9K4M",
+        authDomain: "ri-realtime-transit.firebaseapp.com",
+        databaseURL: "https://ri-realtime-transit.firebaseio.com",
+        storageBucket: "ri-realtime-transit.appspot.com",
+        messagingSenderId: "963209676335"
+      };
+      firebase.initializeApp(config);
+    </script>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script src="js/init_map.js"></script>
+    <script async defer
+      src="https://maps.googleapis.com/maps/api/js?key=KEY&libraries=visualization&callback=initMap">
+    </script>
+  </body>
+</html>
