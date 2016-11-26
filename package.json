@@ -5,5 +5,8 @@
   "main": "index.js",
   "repository": "git@github.com:treiff/ripta-transit-client.git",
   "author": "Trevor Reiff <trevorreiff@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "geofire": "^4.1.2"
+  }
 }

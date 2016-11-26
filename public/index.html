@@ -4,18 +4,10 @@
     <meta charset="utf-8">
     <title>RIPTA bus viewer</title>
     <link rel="stylesheet" type="text/css" href="style/style.css">
-    <script src="https://www.gstatic.com/firebasejs/3.6.1/firebase.js"></script>
-    <script>
-      // Initialize Firebase
-      var config = {
-        apiKey: "AIzaSyCfO-_m33XvSdZ1QXN6aE4cxZVh_MK9K4M",
-        authDomain: "ri-realtime-transit.firebaseapp.com",
-        databaseURL: "https://ri-realtime-transit.firebaseio.com",
-        storageBucket: "ri-realtime-transit.appspot.com",
-        messagingSenderId: "963209676335"
-      };
-      firebase.initializeApp(config);
-    </script>
+    <script src="https://www.gstatic.com/firebasejs/3.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.6.1/firebase-database.js"></script>
+    <script src="https://cdn.firebase.com/libs/geofire/4.1.2/geofire.min.js"></script>
+    <script src="js/app.js"></script>
   </head>
   <body>
     <div id="map"></div>
