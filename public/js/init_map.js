@@ -88,7 +88,7 @@ function createPopUp(currentBusPosition, childData) {
 
   var popup = new mapboxgl.Popup({ closeOnClick: false })
     .setLngLat(currentBusPosition)
-    .setHTML('<h3>' + childData.trip.route_id + ': ' + window.routes[parseInt(childData.trip.route_id)].route_long_name + '</h3>' +
-      '<h4>yup</h4>')
+    .setHTML('<h4>' + childData.trip.route_id + ': ' + window.routes[parseInt(childData.trip.route_id)].route_long_name + '</h4>' +
+      '<h5>yup</h5>')
     .addTo(map);
 }
