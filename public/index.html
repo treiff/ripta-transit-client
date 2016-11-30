@@ -4,16 +4,21 @@
     <meta charset="utf-8">
     <title>RIPTA bus viewer</title>
     <link rel="stylesheet" type="text/css" href="style/style.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/3.6.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/3.6.1/firebase-database.js"></script>
-    <script src="https://cdn.firebase.com/libs/geofire/4.1.2/geofire.min.js"></script>
+    <script src='https://api.mapbox.com/mapbox-gl-js/v0.28.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v0.28.0/mapbox-gl.css' rel='stylesheet' />
     <script src="js/app.js"></script>
   </head>
   <body>
-    <div id="map"></div>
+    <div class='sidebar pad2'>
+      <div class='heading'>
+        <h1>RIPTA Buses</h1>
+      </div>
+      <div id='buses' class='buses'></div>
+    </div>
+    <div id='map'></div>
     <script src="js/init_map.js"></script>
-    <script async defer
-      src="https://maps.googleapis.com/maps/api/js?key=KEY&libraries=visualization&callback=initMap">
-    </script>
   </body>
 </html>

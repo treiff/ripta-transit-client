@@ -10,4 +10,3 @@ var config = {
 firebase.initializeApp(config);
 
 var firebaseRef = firebase.database().ref("buses");
-var geoFire = new GeoFire(firebaseRef);
