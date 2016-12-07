@@ -9,4 +9,4 @@ var config = {
 
 firebase.initializeApp(config);
 
-var firebaseRef = firebase.database().ref("buses");
+var firebasePositionRef = firebase.database().ref("busposition");

@@ -7,69 +7,74 @@ var map = new mapboxgl.Map({
   style: 'mapbox://styles/treiff/ciw0r94y5003a2kr3o6dcll81'
 });
 
-// Fetch route info.
-function jsonCallback(json){
-  window.routes = json;
-}
+var posjson = {"type": "FeatureCollection", "features": []};
 
-$.ajax({
-  url: "https://firebasestorage.googleapis.com/v0/b/ri-realtime-transit.appspot.com/o/routes.json?alt=media&token=246b3d59-6758-4f94-9ec0-9e1ef72ec636",
-  dataType: "jsonp"
+firebasePositionRef.once("value").then(function(snapshot) {
+  snapshot.forEach(function(child) {
+    var bus = child.val(),
+        feature = {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [bus.longitude, bus.latitude]
+          },
+          properties: {
+            busId: child.key,
+            speed: bus.speed
+          }
+        };
+    posjson.features.push(feature);
+  });
 });
 
-// Set markers
-firebaseRef.once("value")
-  .then(function(snapshot) {
-    snapshot.forEach(function(childSnapshot) {
-      var childData = childSnapshot.val(),
-        latLng = [childData.position.longitude, childData.position.latitude],
-        contentString = 'StopId:' + childData.stop_id +
-                        'RouteId:' + childData.trip.route_id +
-                        'Speed:' + childData.position.speed;
+map.on('load', function() {
+  map.addSource('buspos', {
+    type: 'geojson',
+    data: posjson
+  });
 
-       buildLocationList(childData);
-
-        var el = document.createElement('div');
-            el.className = 'marker';
-            el.style.left= '-28px';
-            el.style.top= '-46px';
-
-        var marker = new mapboxgl.Marker(el)
-          .setLngLat(latLng)
-          .addTo(map);
-      });
-    });
+  map.addLayer({
+    "id": "buspos",
+    "type": "symbol",
+    "source": "buspos",
+    "layout": {
+      "icon-image": "bus-15"
+    }
+  });
+});
 
 // Setup sidebar
-function buildLocationList(childData) {
-  var buses = document.getElementById('buses');
-  var bus = buses.appendChild(document.createElement('div'));
-  bus.className = 'item';
-  bus.id = 'listing-' + childData.vehicle.id;
+function buildLocationList(posjson) {
+  posjson.features.forEach(function(marker) {
+    var buses = document.getElementById('buses');
+    var bus = buses.appendChild(document.createElement('div'));
+    bus.className = 'item';
+    bus.id = 'listing-' + marker.properties.busId;
 
-  var link = bus.appendChild(document.createElement('a'));
-  link.href = '#';
-  link.className = 'title';
-  link.dataPosition = childData.vehicle.id;
-  link.innerHTML = childData.trip.route_id + ': ' + window.routes[parseInt(childData.trip.route_id)].route_long_name;
+    var link = bus.appendChild(document.createElement('a'));
+    link.href = '#';
+    link.className = 'title';
+    link.dataPosition = marker.properties.busId;
+    link.innerHTML = marker.properties.routeId + ': ' + routes[parseInt(marker.properties.routeId)].route_long_name;
 
-  // TODO Add next stop data...
-  //
-  var speed = bus.appendChild(document.createElement('div'));
-  var speedVal = childData.position.speed ? parseFloat(childData.position.speed).toFixed(1) : 'n/a';
-  speed.innerHTML = 'speed: ' + speedVal;
+    // TODO Add next stop data...
+    //
+    var speed = bus.appendChild(document.createElement('div'));
+    var speedVal = marker.properties.speed ? parseFloat(marker.properties.speed).toFixed(1) : 'n/a';
+    speed.innerHTML = 'speed: ' + speedVal;
 
-  // Sidebar link event listener
-  link.addEventListener('click', function(e) {
-    var currentBusPosition = [childData.position.longitude, childData.position.latitude];
-    flyToBus(currentBusPosition);
-    createPopUp(currentBusPosition, childData);
+    // Sidebar link event listener
+    link.addEventListener('click', function(e) {
+      var currentBusPosition = marker.geometry.coordinates;
+      flyToBus(currentBusPosition);
+      createPopUp(currentBusPosition, marker);
 
-    var activeItem = document.getElementsByClassName('active');
-    if (activeItem[0]) {
-      activeItem[0].classList.remove('active');
-    }
-    this.parentNode.classList.add('active');
+      var activeItem = document.getElementsByClassName('active');
+      if (activeItem[0]) {
+        activeItem[0].classList.remove('active');
+      }
+      this.parentNode.classList.add('active');
+    });
   });
 }
 
@@ -82,13 +87,33 @@ function flyToBus(currentBusPosition) {
 }
 
 // Marker popup
-function createPopUp(currentBusPosition, childData) {
+function createPopUp(currentBusPosition, marker) {
   var popUps = document.getElementsByClassName('mapboxgl-popup');
   if (popUps[0]) popUps[0].remove();
 
-  var popup = new mapboxgl.Popup({ closeOnClick: false })
+  var popup = new mapboxgl.Popup({ closeOnClick: true })
     .setLngLat(currentBusPosition)
-    .setHTML('<h4>' + childData.trip.route_id + ': ' + window.routes[parseInt(childData.trip.route_id)].route_long_name + '</h4>' +
+    .setHTML('<h4>' + marker.properties.routeId + ': ' + routes[parseInt(marker.properties.routeId)].route_long_name + '</h4>' +
       '<h5>yup</h5>')
     .addTo(map);
 }
+
+updatedposjson = {"type": "FeatureCollection", "features": []};
+
+firebasePositionRef.on('child_changed', function(childSnapshot, prevChildKey) {
+  var bus = childSnapshot.val();
+  updatedposjson.features.push(
+    {
+      type: 'Feature',
+      geometry: {
+        type: 'Point',
+        coordinates: [bus.longitude, bus.latitude]
+      },
+      properties: {
+        busId: prevChildKey,
+        speed: bus.speed || 'n/a',
+      }
+    }
+  );
+  map.getSource('buspos').setData(updatedposjson);
+});
