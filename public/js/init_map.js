@@ -23,23 +23,31 @@ firebasePositionRef.once("value").then(function(snapshot) {
             speed: bus.speed
           }
         };
+
     posjson.features.push(feature);
-  });
-});
 
-map.on('load', function() {
-  map.addSource('buspos', {
-    type: 'geojson',
-    data: posjson
-  });
+    map.addSource(child.key, {
+      type: 'geojson',
+      data: posjson,
+    });
 
-  map.addLayer({
-    "id": "buspos",
-    "type": "symbol",
-    "source": "buspos",
-    "layout": {
-      "icon-image": "bus-15"
-    }
+    map.addLayer({
+      "id": child.key,
+      "type": "symbol",
+      "source": child.key,
+      "layout": {
+        "icon-image": "bus-15"
+      }
+    });
+
+    map.on('click', function (e) {
+      var features = map.queryRenderedFeatures(e.point, { layers: [child.key] });
+      if (features.length) {
+        map.flyTo({center: features[0].geometry.coordinates});
+      }
+    });
+
+    posjson.features = [];
   });
 });
 
@@ -115,5 +123,6 @@ firebasePositionRef.on('child_changed', function(childSnapshot, prevChildKey) {
       }
     }
   );
-  map.getSource('buspos').setData(updatedposjson);
+  map.getSource(prevChildKey).setData(updatedposjson);
+  updatedposjson.features = [];
 });
